@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# Vector store / local data
+.chroma/
+data/raw/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store

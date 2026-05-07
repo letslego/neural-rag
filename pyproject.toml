@@ -1,0 +1,26 @@
+[project]
+name = "neural-rag"
+version = "0.1.0"
+description = "Neural (dense) retrieval-augmented generation pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "chromadb>=0.5.0",
+    "sentence-transformers>=3.0.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "typer>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "ruff>=0.6.0"]
+
+[project.scripts]
+neural-rag = "neural_rag.cli:app"
+
+[build-system]
+requires = ["setuptools>=69.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
