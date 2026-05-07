@@ -1,0 +1,3 @@
+{"head": "RefundPolicy", "relation": "full_refund_within", "tail": "30 days"}
+{"head": "RefundPolicy", "relation": "contact", "tail": "support@example.com"}
+{"head": "Acme Corp", "relation": "has_policy", "tail": "RefundPolicy"}

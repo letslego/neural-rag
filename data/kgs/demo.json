@@ -1,0 +1,41 @@
+{
+  "entity_id": {
+    "RefundPolicy": 0,
+    "30 days": 1,
+    "support@example.com": 2,
+    "Acme Corp": 3
+  },
+  "id_entity": [
+    "RefundPolicy",
+    "30 days",
+    "support@example.com",
+    "Acme Corp"
+  ],
+  "relation_id": {
+    "full_refund_within": 0,
+    "contact": 1,
+    "has_policy": 2
+  },
+  "id_relation": [
+    "full_refund_within",
+    "contact",
+    "has_policy"
+  ],
+  "triplets": [
+    [
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      2,
+      1
+    ],
+    [
+      3,
+      0,
+      2
+    ]
+  ]
+}

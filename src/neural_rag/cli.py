@@ -2,37 +2,56 @@ from pathlib import Path
 
 import typer
 
-from neural_rag.config import DEFAULT_TOP_K
-from neural_rag.rag import answer
-from neural_rag.store import ingest_files
+from neural_rag.config import DATA_DIR, DEFAULT_TOP_K, GNN_WEIGHTS
+from neural_rag.gnn_rag import answer
+from neural_rag.kg_data import KnowledgeGraph, kg_path_for_collection, load_triplets_file
 
 app = typer.Typer(no_args_is_help=True)
 
 
 @app.command()
 def ingest(
-    path: Path = typer.Argument(..., exists=True, file_okay=False, dir_okay=True),
-    collection: str = typer.Option("default", help="Chroma collection name"),
-    pattern: str = typer.Option("**/*.txt", help="Glob relative to path"),
-    chunk_size: int = typer.Option(800, help="Max characters per chunk"),
+    path: Path = typer.Argument(..., exists=True, file_okay=True, dir_okay=True, help="Triplet file or directory"),
+    collection: str = typer.Option("default", help="Name for this knowledge graph"),
 ):
-    """Index .txt files under PATH into the vector store."""
-    files = sorted(path.glob(pattern))
-    if not files:
-        typer.echo(f"No files matched {pattern!r} under {path}", err=True)
+    """Load triplets (head, relation, tail) and persist a KG for GNN-RAG."""
+    if path.is_dir():
+        files = sorted(path.glob("**/*.jsonl")) + sorted(path.glob("**/*.csv"))
+        triplets: list[tuple[str, str, str]] = []
+        for f in files:
+            triplets.extend(load_triplets_file(f))
+    else:
+        triplets = load_triplets_file(path)
+    if not triplets:
+        typer.echo(f"No triplets found in {path}", err=True)
         raise typer.Exit(code=1)
-    n = ingest_files(files, collection, chunk_size=chunk_size)
-    typer.echo(f"Ingested {n} chunks into collection {collection!r}.")
+
+    kg = KnowledgeGraph()
+    for h, r, t in triplets:
+        kg.add_triplet(h, r, t)
+
+    out = kg_path_for_collection(Path(DATA_DIR), collection)
+    kg.save(out)
+    typer.echo(
+        f"Saved KG {collection!r}: {len(kg.id_entity)} entities, "
+        f"{len(kg.id_relation)} relations, {len(kg.triplets)} triplets → {out}"
+    )
 
 
 @app.command()
 def ask(
     question: str = typer.Argument(...),
-    collection: str = typer.Option("default", help="Chroma collection name"),
-    top_k: int = typer.Option(DEFAULT_TOP_K, help="Number of chunks to retrieve"),
+    collection: str = typer.Option("default", help="KG name from ingest"),
+    top_k: int = typer.Option(DEFAULT_TOP_K, help="Top GNN answer candidates for path extraction"),
+    weights: Path | None = typer.Option(
+        None,
+        exists=False,
+        help="Optional PyTorch state_dict for QuestionConditionedGNN",
+    ),
 ):
-    """Retrieve context and answer with the configured LLM."""
-    result = answer(question, collection, top_k=top_k)
+    """GNN retrieval over a subgraph, shortest-path verbalization, then LLM answer."""
+    wp = weights if weights is not None else (Path(GNN_WEIGHTS) if GNN_WEIGHTS else None)
+    result = answer(question, collection, top_k=top_k, weights_path=wp)
     typer.echo(result)
 
 

@@ -1,12 +1,17 @@
 [project]
 name = "neural-rag"
-version = "0.1.0"
-description = "Neural (dense) retrieval-augmented generation pipeline"
+version = "0.2.0"
+description = "Neural (dense) retrieval-augmented generation with Chroma and sentence-transformers"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.14"
+# PyTorch 2.4+ is not published for all macOS targets (e.g. x86_64); keep 2.2.x + numpy 1.x + older transformers.
 dependencies = [
     "chromadb>=0.5.0",
-    "sentence-transformers>=3.0.0",
+    "networkx>=3.2.0",
+    "torch>=2.2.0,<2.3",
+    "numpy>=1.26,<2",
+    "transformers>=4.36.0,<4.46.0",
+    "sentence-transformers>=3.0.0,<3.2.0",
     "openai>=1.0.0",
     "python-dotenv>=1.0.0",
     "typer>=0.12.0",
