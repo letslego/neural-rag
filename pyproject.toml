@@ -1,7 +1,7 @@
 [project]
 name = "neural-rag"
 version = "0.2.0"
-description = "Neural (dense) retrieval-augmented generation with Chroma and sentence-transformers"
+description = "GNN-RAG scaffold: subgraph retrieval, verbalized reasoning paths, LLM (arXiv:2405.20139)"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 # PyTorch 2.4+ is not published for all macOS targets (e.g. x86_64); keep 2.2.x + numpy 1.x + older transformers.
